@@ -333,14 +333,14 @@
     </div>
 </div>
 
-<!-- MODAL OPCIONES (Variantes de producto) -->
+<!-- MODAL OPCIONES (Solo para infladitas) -->
 <div id="optionsModal" class="fixed inset-0 z-50 hidden items-end justify-center">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeOptionsModal()"></div>
     <div class="relative w-full max-w-md bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.22)] max-h-[92vh] overflow-y-auto">
         <div class="p-4 border-b flex justify-between items-start gap-4 sticky top-0 bg-white z-10">
             <div>
                 <p class="text-[11px] uppercase tracking-[0.18em] text-gray-400 font-semibold">Personaliza tu pedido</p>
-                <h2 id="optionsTitle" class="text-xl font-bold text-brand-dark">Elegir opciones</h2>
+                <h2 id="optionsTitle" class="text-xl font-bold text-brand-dark">Elegir tipo</h2>
                 <p id="optionsSubtitle" class="text-sm text-gray-500 mt-1"></p>
             </div>
             <button onclick="closeOptionsModal()" class="text-gray-400 hover:text-gray-700 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100"><i class="fa-solid fa-xmark"></i></button>
@@ -370,10 +370,10 @@
         </div>
 
         <div class="p-4 border-t bg-white sticky bottom-0 w-full shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-            <button onclick="confirmOptions()" class="w-full bg-brand-red text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-brand-red/30 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
-            </button>
-        </div>
+                <button onclick="confirmOptions()" class="w-full bg-brand-red text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-brand-red/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                </button>
+            </div>
     </div>
 </div>
 
@@ -411,141 +411,11 @@
     let cart = {};
     let selectedOptionState = null;
 
-    const familyConfigs = {
-        'Infladitas Placeras': {
-            title: 'Infladitas',
-            subtitle: 'Elige tipo, guisado y cantidad.',
-            groups: [
-                {
-                    key: 'tipo',
-                    label: 'Tipo',
-                    options: [
-                        { label: 'Placera', price: 20 },
-                        { label: 'Sencilla', price: 25 },
-                        { label: 'Preparada de frijol', price: 30 }
-                    ]
-                },
-                {
-                    key: 'guisado',
-                    label: 'Guisado',
-                    options: [
-                        { label: 'Pollo', price: 0 },
-                        { label: 'Chicharrón', price: 0 },
-                        { label: 'Tinga', price: 0 },
-                        { label: 'Champiñones', price: 0 },
-                        { label: 'Picadillo', price: 0 },
-                        { label: 'Longaniza con papas', price: 0 }
-                    ]
-                }
-            ]
-        },
-        'Tostadas': {
-            title: 'Tostadas',
-            subtitle: 'Escoge tipo y sabor.',
-            groups: [
-                {
-                    key: 'tipo',
-                    label: 'Tipo',
-                    options: [
-                        { label: 'Sencilla', price: 25 },
-                        { label: 'Preparada', price: 30 }
-                    ]
-                },
-                {
-                    key: 'sabor',
-                    label: 'Con',
-                    options: [
-                        { label: 'Pollo', price: 0 },
-                        { label: 'Tinga', price: 0 },
-                        { label: 'Picadillo', price: 0 }
-                    ]
-                }
-            ]
-        },
-        'Pozole de Puerco': {
-            title: 'Pozole',
-            subtitle: 'Elige el estilo y el tamaño.',
-            groups: [
-                {
-                    key: 'presentacion',
-                    label: 'Presentación',
-                    options: [
-                        { label: 'Rojo de puerco - Grande', price: 80 },
-                        { label: 'Rojo de puerco - Chico', price: 70 },
-                        { label: 'Blanco de pollo - Grande', price: 70 },
-                        { label: 'Blanco de pollo - Chico', price: 60 }
-                    ]
-                }
-            ]
-        },
-        'Quesadillas': {
-            title: 'Quesadillas',
-            subtitle: 'Selecciona tamaño.',
-            groups: [
-                {
-                    key: 'tipo',
-                    label: 'Tamaño',
-                    options: [
-                        { label: 'Sencillas', price: 25 },
-                        { label: 'Dobles', price: 30 }
-                    ]
-                }
-            ]
-        },
-        'Tacos Dorados': {
-            title: 'Tacos Dorados',
-            subtitle: 'Elige relleno para tu orden.',
-            groups: [
-                {
-                    key: 'orden',
-                    label: 'Orden',
-                    options: [
-                        { label: 'Orden con 4', price: 30 }
-                    ]
-                },
-                {
-                    key: 'relleno',
-                    label: 'Relleno',
-                    options: [
-                        { label: 'Papa', price: 0 },
-                        { label: 'Requesón', price: 0 },
-                        { label: 'Longaniza', price: 0 },
-                        { label: 'Rajas', price: 0 }
-                    ]
-                }
-            ]
-        },
-        'Bebidas': {
-            title: 'Bebidas',
-            subtitle: 'Selecciona la opción que prefieras.',
-            groups: [
-                {
-                    key: 'bebida',
-                    label: 'Bebida',
-                    options: [
-                        { label: 'Agua fresca 1 litro', price: 30 },
-                        { label: 'Agua fresca 1/2 litro', price: 20 },
-                        { label: 'Refresco', price: 25 },
-                        { label: 'Postres', price: 35 }
-                    ]
-                }
-            ]
-        },
-        'Postres': {
-            title: 'Postres',
-            subtitle: 'Elige tu postre.',
-            groups: [
-                {
-                    key: 'postre',
-                    label: 'Postre',
-                    options: [
-                        { label: 'Flan de leche', price: 35 },
-                        { label: 'Postre sorpresa', price: 0, note: 'Próximamente' }
-                    ]
-                }
-            ]
-        }
-    };
+    const infladitaTypeOptions = [
+        { label: 'Placera', price: 20 },
+        { label: 'Sencilla', price: 25 },
+        { label: 'Preparada de frijol', price: 30 }
+    ];
 
     const categoryIcons = {
         'Infladitas Placeras': '<i class="fa-solid fa-cookie"></i>',
@@ -692,14 +562,6 @@
         renderCatalog(cat === 'Todas' ? catalog : catalog.filter(p => p.Categoria === cat));
     }
 
-    function getCategoryConfig(categoryName) {
-        return familyConfigs[categoryName] || null;
-    }
-
-    function isAvailableItem(item) {
-        return !(item.Disponibilidad && item.Disponibilidad.toLowerCase() === 'próximamente');
-    }
-
     function escapeHtml(value) {
         return String(value ?? '')
             .replaceAll('&', '&amp;')
@@ -709,76 +571,27 @@
             .replaceAll("'", '&#39;');
     }
 
-    function getRepresentativeItem(items) {
-        return items.find(isAvailableItem) || items[0];
+    function isAvailableItem(item) {
+        return !(item.Disponibilidad && item.Disponibilidad.toLowerCase() === 'próximamente');
     }
 
-    function getCategoryMinPrice(items, config) {
-        if (config) {
-            const prices = config.groups.flatMap(group => group.options.map(option => Number(option.price) || 0));
-            return prices.length ? Math.min(...prices) : 0;
-        }
-        const prices = items.map(item => Number.parseFloat(item.Precio) || 0);
-        return prices.length ? Math.min(...prices) : 0;
+    function isInfladita(item) {
+        return item.Categoria === 'Infladitas Placeras';
     }
 
-    function getSelectedOption(groupKey) {
-        if (!selectedOptionState) return null;
-        const groupIndex = selectedOptionState.config.groups.findIndex(group => group.key === groupKey);
-        if (groupIndex === -1) return null;
-        const selectedIndex = selectedOptionState.selections[groupKey] ?? 0;
-        return selectedOptionState.config.groups[groupIndex].options[selectedIndex] || null;
+    function getInfladitaPrice(index) {
+        return infladitaTypeOptions[index] || infladitaTypeOptions[0];
     }
 
-    function getOptionSubtotal() {
-        if (!selectedOptionState) return 0;
-        return selectedOptionState.config.groups.reduce((sum, group) => {
-            const selectedIndex = selectedOptionState.selections[group.key] ?? 0;
-            const option = group.options[selectedIndex] || group.options[0];
-            return sum + (Number(option.price) || 0);
-        }, 0);
-    }
+    function openOptionsModal(itemId) {
+        const item = catalog.find(product => product.ID === itemId);
+        if (!item) return;
 
-    function getOptionSummary() {
-        if (!selectedOptionState) return '';
-        return selectedOptionState.config.groups.map(group => {
-            const selectedIndex = selectedOptionState.selections[group.key] ?? 0;
-            const option = group.options[selectedIndex] || group.options[0];
-            return option.label;
-        }).join(' · ');
-    }
-
-    function updateOptionSelection(groupKey, index) {
-        if (!selectedOptionState) return;
-        selectedOptionState.selections[groupKey] = index;
-        renderOptionsModal();
-    }
-
-    function changeOptionQty(delta) {
-        if (!selectedOptionState) return;
-        selectedOptionState.quantity = Math.max(1, (selectedOptionState.quantity || 1) + delta);
-        renderOptionsModal();
-    }
-
-    function openOptionsModal(categoryName) {
-        const config = getCategoryConfig(categoryName);
-        const categoryItems = catalog.filter(item => item.Categoria === categoryName);
-        if (!config || categoryItems.length === 0) return;
-
-        const representative = getRepresentativeItem(categoryItems);
         selectedOptionState = {
-            categoryName,
-            title: config.title || categoryName,
-            subtitle: config.subtitle || '',
-            image: representative.Imagen || 'https://via.placeholder.com/600x400?text=Sin+Imagen',
+            item,
             quantity: 1,
-            selections: {},
-            config
+            selectedTypeIndex: 0
         };
-
-        config.groups.forEach(group => {
-            selectedOptionState.selections[group.key] = 0;
-        });
 
         renderOptionsModal();
         document.getElementById('optionsModal').classList.remove('hidden');
@@ -797,81 +610,77 @@
         }
     }
 
+    function changeOptionQty(delta) {
+        if (!selectedOptionState) return;
+        selectedOptionState.quantity = Math.max(1, selectedOptionState.quantity + delta);
+        renderOptionsModal();
+    }
+
+    function selectInfladitaType(index) {
+        if (!selectedOptionState) return;
+        selectedOptionState.selectedTypeIndex = index;
+        renderOptionsModal();
+    }
+
     function renderOptionsModal() {
         if (!selectedOptionState) return;
 
-        document.getElementById('optionsTitle').textContent = selectedOptionState.title;
-        document.getElementById('optionsSubtitle').textContent = selectedOptionState.subtitle;
-        document.getElementById('optionsImage').src = selectedOptionState.image;
-        document.getElementById('optionsQty').textContent = selectedOptionState.quantity;
+        const { item, quantity, selectedTypeIndex } = selectedOptionState;
+        const type = getInfladitaPrice(selectedTypeIndex);
+
+        document.getElementById('optionsTitle').textContent = item.Nombre;
+        document.getElementById('optionsSubtitle').textContent = 'Elige el tipo de infladita y la cantidad.';
+        document.getElementById('optionsImage').src = item.Imagen || 'https://via.placeholder.com/600x400?text=Sin+Imagen';
+        document.getElementById('optionsQty').textContent = quantity;
+        document.getElementById('optionsTotal').textContent = `$${(type.price * quantity).toFixed(2)}`;
 
         const groupsContainer = document.getElementById('optionsGroups');
-        groupsContainer.innerHTML = '';
-
-        selectedOptionState.config.groups.forEach(group => {
-            const selectedIndex = selectedOptionState.selections[group.key] ?? 0;
-            const groupCard = document.createElement('div');
-            groupCard.className = 'p-4 rounded-2xl border border-gray-100 bg-gray-50';
-
-            const optionsHtml = group.options.map((option, index) => {
-                const isActive = index === selectedIndex;
-                const priceLabel = Number(option.price) > 0 ? `+$${Number(option.price).toFixed(2)}` : '';
-                const extraLabel = option.note ? `<span class="text-[10px] text-gray-400 block mt-0.5">${escapeHtml(option.note)}</span>` : '';
-                return `
-                    <button
-                        onclick="updateOptionSelection('${group.key}', ${index})"
-                        class="text-left rounded-xl border px-3 py-2 transition ${isActive ? 'border-brand-red bg-brand-red text-white shadow-md' : 'border-gray-200 bg-white text-gray-700'}"
-                    >
-                        <span class="block text-sm font-semibold">${escapeHtml(option.label)}</span>
-                        ${priceLabel ? `<span class="block text-[11px] ${isActive ? 'text-white/90' : 'text-brand-green font-semibold'}">${priceLabel}</span>` : ''}
-                        ${extraLabel}
-                    </button>
-                `;
-            }).join('');
-
-            groupCard.innerHTML = `
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-brand-dark">${escapeHtml(group.label)}</h3>
+        groupsContainer.innerHTML = `
+            <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                <h3 class="font-bold text-brand-dark mb-3">Tipo</h3>
+                <div class="grid grid-cols-1 gap-2">
+                    ${infladitaTypeOptions.map((option, index) => {
+                        const isActive = index === selectedTypeIndex;
+                        return `
+                            <button
+                                onclick="selectInfladitaType(${index})"
+                                class="text-left rounded-xl border px-3 py-2 transition ${isActive ? 'border-brand-red bg-brand-red text-white shadow-md' : 'border-gray-200 bg-white text-gray-700'}"
+                            >
+                                <span class="block text-sm font-semibold">${escapeHtml(option.label)}</span>
+                                <span class="block text-[11px] ${isActive ? 'text-white/90' : 'text-brand-green font-semibold'}">$${Number(option.price).toFixed(2)}</span>
+                            </button>
+                        `;
+                    }).join('')}
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    ${optionsHtml}
-                </div>
-            `;
-            groupsContainer.appendChild(groupCard);
-        });
-
-        const subtotal = getOptionSubtotal();
-        const total = subtotal * selectedOptionState.quantity;
-        document.getElementById('optionsTotal').textContent = `$${total.toFixed(2)}`;
+            </div>
+        `;
     }
 
     function confirmOptions() {
         if (!selectedOptionState) return;
 
-        const subtotal = getOptionSubtotal();
-        const optionSummary = getOptionSummary();
-        const key = `${selectedOptionState.categoryName}::${optionSummary}`;
-        const title = selectedOptionState.title;
-        const representative = catalog.find(item => item.Categoria === selectedOptionState.categoryName) || {};
+        const { item, quantity, selectedTypeIndex } = selectedOptionState;
+        const type = getInfladitaPrice(selectedTypeIndex);
+        const key = `${item.ID}::${type.label}`;
+        const productName = `${item.Nombre} - ${type.label}`;
 
         if (!cart[key]) {
             cart[key] = {
                 product: {
                     ID: key,
-                    Nombre: title,
-                    Categoria: selectedOptionState.categoryName,
-                    Precio: subtotal.toFixed(2),
-                    Imagen: selectedOptionState.image || representative.Imagen || 'https://via.placeholder.com/300x200?text=Sin+Imagen',
-                    Badge: representative.Badge || '',
-                    Disponibilidad: 'Activo'
+                    Nombre: productName,
+                    Categoria: item.Categoria,
+                    Precio: type.price.toFixed(2),
+                    Imagen: item.Imagen,
+                    Badge: item.Badge || '',
+                    Disponibilidad: item.Disponibilidad || 'Activo'
                 },
                 quantity: 0,
-                variantLabel: optionSummary
+                variantLabel: `Tipo: ${type.label}`
             };
         }
 
-        cart[key].quantity += selectedOptionState.quantity;
-        cart[key].variantLabel = optionSummary;
+        cart[key].quantity += quantity;
         updateBadges();
         renderCartModal();
         renderCatalog(activeCategory === 'Todas' ? catalog : catalog.filter(p => p.Categoria === activeCategory));
@@ -894,60 +703,48 @@
         }, {});
 
         Object.entries(groupedItems).forEach(([categoryName, categoryItems]) => {
-            const config = getCategoryConfig(categoryName);
             const header = document.createElement('div');
             header.className = "col-span-full mt-6 mb-2 flex items-center gap-2 border-b-2 border-gray-100 pb-2";
             const icon = categoryIcons[categoryName] || '<i class="fa-solid fa-utensils"></i>';
             header.innerHTML = `
                     <span class="text-brand-red text-xl">${icon}</span>
-                    <h2 class="text-lg font-bold text-brand-dark">${escapeHtml(config?.title || categoryName)}</h2>
+                    <h2 class="text-lg font-bold text-brand-dark">${escapeHtml(categoryName)}</h2>
                 `;
             grid.appendChild(header);
-
-            if (config) {
-                const representative = getRepresentativeItem(categoryItems);
-                const available = categoryItems.some(isAvailableItem);
-                const badge = categoryItems.find(item => item.Badge && item.Badge.trim() !== '')?.Badge || '';
-                const minPrice = getCategoryMinPrice(categoryItems, config);
-                const optionSummary = config.groups.map(group => group.label).join(' · ');
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden flex flex-col relative";
-                card.innerHTML = `
-                    ${badge ? `<div class="absolute top-1 left-1 bg-brand-orange text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">${escapeHtml(badge)}</div>` : ''}
-                    <div class="h-24 sm:h-28 bg-gray-200 relative">
-                        <img src="${representative?.Imagen || 'https://via.placeholder.com/300x200?text=Sin+Imagen'}" alt="${escapeHtml(config.title || categoryName)}" class="w-full h-full object-cover ${!available ? 'grayscale opacity-70' : ''}">
-                    </div>
-                    <div class="p-3 flex flex-col flex-1">
-                        <h3 class="font-semibold text-sm leading-tight text-gray-800 mb-1">${escapeHtml(config.title || categoryName)}</h3>
-                        <p class="text-[11px] text-gray-500 mb-2 line-clamp-2">${escapeHtml(config.subtitle || optionSummary)}</p>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">Desde $${Number(minPrice).toFixed(2)}</span>
-                            <span class="text-[10px] text-gray-400">${escapeHtml(categoryItems.length > 1 ? `${categoryItems.length} opciones` : '1 opción')}</span>
-                        </div>
-                        <button onclick="openOptionsModal('${categoryName}')" ${available ? '' : 'disabled'} class="w-full py-2 rounded-md bg-brand-red text-white font-semibold text-[11px] hover:opacity-90 transition flex items-center justify-center gap-1 border border-brand-red ${available ? '' : 'opacity-70 cursor-not-allowed'} disabled:opacity-70 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-sliders"></i> Elegir opciones
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-                return;
-            }
 
             categoryItems.forEach(item => {
                 const card = document.createElement('div');
                 const isAvailable = isAvailableItem(item);
                 const cardPrice = Number.parseFloat(item.Precio) || 0;
+                const badge = item.Badge && item.Badge.trim() !== '' ? item.Badge : '';
+                const infladita = isInfladita(item);
                 card.className = "bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden flex flex-col relative";
                 card.innerHTML = `
-                    ${item.Badge && item.Badge.trim() !== '' ? `<div class="absolute top-1 left-1 bg-brand-orange text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">${escapeHtml(item.Badge)}</div>` : ''}
+                    ${badge ? `<div class="absolute top-1 left-1 bg-brand-orange text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">${escapeHtml(badge)}</div>` : ''}
                     <div class="h-20 sm:h-24 bg-gray-200 relative">
                         <img src="${item.Imagen || 'https://via.placeholder.com/300x200?text=Sin+Imagen'}" alt="${escapeHtml(item.Nombre)}" class="w-full h-full object-cover ${!isAvailable ? 'grayscale opacity-70' : ''}">
                     </div>
                     <div class="p-2 flex flex-col flex-1">
                         <h3 class="font-semibold text-[11px] leading-tight text-gray-800 mb-1 flex-1 line-clamp-2" title="${escapeHtml(item.Nombre)}">${escapeHtml(item.Nombre)}</h3>
                         <div class="flex items-center justify-between mb-2 mt-1">
-                            ${isAvailable ? `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">$${cardPrice.toFixed(2)}</span>` : `<span class="font-bold text-gray-400 text-[10px] italic">Próximamente</span>`}
+                            ${infladita
+                                ? `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">Desde $${infladitaTypeOptions[0].price.toFixed(2)}</span>`
+                                : (isAvailable ? `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">$${cardPrice.toFixed(2)}</span>` : `<span class="font-bold text-gray-400 text-[10px] italic">Próximamente</span>`)
+                            }
+                        </div>
+                        <div class="mt-auto">
+                            ${infladita
+                                ? `<button onclick="openOptionsModal('${item.ID}')" ${isAvailable ? '' : 'disabled'} class="w-full py-1.5 rounded-md bg-gray-50 text-brand-red font-semibold text-[11px] hover:bg-brand-red hover:text-white transition flex items-center justify-center gap-1 border border-gray-100 disabled:opacity-70 disabled:cursor-not-allowed">
+                                        <i class="fa-solid fa-sliders"></i> Elegir tipo
+                                   </button>`
+                                : (
+                                    isAvailable
+                                        ? `<button onclick="updateQty('${item.ID}', 1)" class="w-full py-1.5 rounded-md bg-gray-50 text-brand-red font-semibold text-[11px] hover:bg-brand-red hover:text-white transition flex items-center justify-center gap-1 border border-gray-100">
+                                                <i class="fa-solid fa-plus text-[9px]"></i> Agregar
+                                           </button>`
+                                        : `<div class="w-full py-1.5 rounded-md bg-gray-100 text-gray-400 font-semibold text-[10px] text-center border border-gray-200">Agotado</div>`
+                                )
+                            }
                         </div>
                     </div>
                 `;
