@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <!-- Fondo blanco para cumplir con el tamaño exacto y contraste -->
+  <rect width="1080" height="1080" fill="#FFFFFF"/>
+
+  <!-- Estilos globales para tipografía y trazos limpios -->
+  <style>
+    .text-title {
+      font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 800;
+      font-size: 68px;
+      /* Color principal: Rosa Mexicano */
+      fill: #E75480;
+      text-anchor: middle;
+      letter-spacing: 2px;
+    }
+    .text-subtitle {
+      font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 36px;
+      /* Color principal: Rosa Mexicano */
+      fill: #E75480;
+      text-anchor: middle;
+      letter-spacing: 6px;
+    }
+    .icon-stroke {
+      fill: none;
+      /* Color principal: Rosa Mexicano */
+      stroke: #E75480;
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .icon-fill {
+      /* Color principal: Rosa Mexicano */
+      fill: #E75480;
+    }
+  </style>
+
+  <!-- Contenedor centrado del logotipo -->
+  <g transform="translate(0, 40)">
+    
+    <!-- ISOTIPO: Quesadilla/Infladita estilizada con detalles de comida mexicana (Líneas simples y limpias) -->
+    <g transform="translate(540, 310)">
+      <!-- Círculo base decorativo sutil (Atenuado para mantener la sencillez) -->
+      <circle cx="0" cy="0" r="170" fill="none" stroke="#E75480" stroke-width="6" stroke-dasharray="12 12" opacity="0.2"/>
+
+      <!-- Quesadilla / Infladita en forma de media luna -->
+      <path class="icon-stroke" d="M -130,20 C -70,-80 70,-80 130,20 C 100,80 -100,80 -130,20 Z" />
+      
+      <!-- Textura de doblez / borde tradicional -->
+      <path class="icon-stroke" d="M -115,28 C -65,-50 65,-50 115,28" stroke-width="8"/>
+
+      <!-- Elementos internos / Relleno icónico simplificado (vapor y queso derritiéndose) -->
+      <circle cx="-30" cy="45" r="8" class="icon-fill"/>
+      <circle cx="20" cy="55" r="6" class="icon-fill"/>
+      <path class="icon-stroke" d="M -10,35 Q 0,45 10,35" stroke-width="8"/>
+
+      <!-- Líneas de vapor superior -->
+      <path class="icon-stroke" d="M -30,-110 Q -20,-130 -30,-150" stroke-width="10"/>
+      <path class="icon-stroke" d="M 30,-100 Q 40,-120 30,-140" stroke-width="10"/>
+    </g>
+
+    <!-- TIPOGRAFÍA: Legible, fuerte y moderna -->
+    <!-- Texto Principal -->
+    <text x="540" y="605" class="text-title">INFLADITAS</text>
+
+    <!-- Línea divisoria decorativa minimalista -->
+    <line x1="440" y1="650" x2="640" y2="650" stroke="#E75480" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Texto Secundario -->
+    <text x="540" y="720" class="text-subtitle">LA MICHOACANA</text>
+
+  </g>
+</svg>

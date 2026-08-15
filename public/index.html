@@ -120,6 +120,10 @@
             background: #E3003F !important;
         }
 
+        .category-anchor {
+            scroll-margin-top: 170px;
+        }
+
         @keyframes cart-bounce {
             0% { transform: translateY(0) scale(1); }
             20% { transform: translateY(-10px) scale(1.08); }
@@ -629,6 +633,7 @@
         document.getElementById('searchInput').value = '';
         renderCategoryFilters();
         renderCatalog(cat === 'Todas' ? catalog : catalog.filter(p => p.Categoria === cat));
+        scrollToCategory(normalizeCategoryName(cat));
     }
 
     function ensureRequiredItems(items) {
@@ -654,6 +659,19 @@
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#39;');
+    }
+
+    function getCategoryAnchorId(categoryName) {
+        return `category-${String(categoryName ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+    }
+
+    function scrollToCategory(categoryName) {
+        if (!categoryName || categoryName === 'Todas') return;
+        setTimeout(() => {
+            const target = document.getElementById(getCategoryAnchorId(categoryName));
+            if (!target) return;
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
     }
 
     function isAvailableItem(item) {
@@ -978,7 +996,8 @@
             const categoryItems = groupedItems[categoryName];
             const simpleQuantityCategory = ['Tacos Dorados', 'Refrescos', 'Postres'].includes(categoryName);
             const header = document.createElement('div');
-            header.className = "col-span-full mt-6 mb-2 flex items-center gap-2 border-b-2 border-gray-100 pb-2";
+            header.className = "category-anchor col-span-full mt-6 mb-2 flex items-center gap-2 border-b-2 border-gray-100 pb-2";
+            header.id = getCategoryAnchorId(categoryName);
             const icon = categoryIcons[categoryName] || '<i class="fa-solid fa-utensils"></i>';
             const config = getMenuConfig(categoryName);
             const dayBadge = config?.dayBadge ? `<span class="ml-auto text-[10px] font-bold px-2 py-1 rounded-full ${config.dayBadge === 'Viernes' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'}">${config.dayBadge}</span>` : '';
