@@ -417,6 +417,76 @@
         { label: 'Preparada de frijol', price: 30 }
     ];
 
+    const menuConfigs = {
+        'Infladitas Placeras': {
+            mode: 'infladita',
+            dayBadge: 'Viernes',
+            title: 'Infladitas',
+            variantLabel: 'Tipo'
+        },
+        'Tostadas': {
+            mode: 'singleVariant',
+            dayBadge: 'Sábado',
+            title: 'Tostadas',
+            subtitle: 'Elige el tipo y la cantidad.',
+            variantLabel: 'Tipo',
+            options: [
+                { label: 'Sencilla', price: 25 },
+                { label: 'Preparada', price: 30 }
+            ]
+        },
+        'Pozole de Puerco': {
+            mode: 'pozole',
+            dayBadge: 'Sábado',
+            title: 'Pozole',
+            subtitle: 'Elige el tipo y el tamaño.',
+            variantLabel: 'Tipo',
+            styles: [
+                { label: 'Rojo de puerco' },
+                { label: 'Blanco de pollo' }
+            ],
+            sizes: [
+                { label: 'Grande' },
+                { label: 'Chico' }
+            ],
+            priceMap: {
+                'Rojo de puerco|Grande': 80,
+                'Rojo de puerco|Chico': 70,
+                'Blanco de pollo|Grande': 70,
+                'Blanco de pollo|Chico': 60
+            }
+        },
+        'Tacos Dorados': {
+            mode: 'quantity',
+            dayBadge: 'Sábado',
+            title: 'Tacos Dorados',
+            subtitle: 'Orden con 4 tacos',
+            variantLabel: 'Orden',
+            fixedPrice: 30
+        },
+        'Aguas Frescas': {
+            mode: 'singleVariant',
+            title: 'Aguas Frescas',
+            subtitle: 'Elige el tamaño y la cantidad.',
+            variantLabel: 'Tamaño',
+            options: [
+                { label: '1 litro', price: 30 },
+                { label: '1/2 litro', price: 20 }
+            ]
+        },
+        'Quesadillas': {
+            mode: 'singleVariant',
+            dayBadge: 'Viernes',
+            title: 'Quesadillas',
+            subtitle: 'Elige el tipo y la cantidad.',
+            variantLabel: 'Tipo',
+            options: [
+                { label: 'Sencilla', price: 25 },
+                { label: 'Doble', price: 30 }
+            ]
+        }
+    };
+
     const categoryIcons = {
         'Infladitas Placeras': '<i class="fa-solid fa-cookie"></i>',
         'Tostadas': '<i class="fa-solid fa-pizza-slice"></i>',
@@ -507,7 +577,7 @@
                 if(response.ok) dataToParse = await response.text();
             }
 
-            catalog = parseCSV(dataToParse);
+            catalog = ensureRequiredItems(parseCSV(dataToParse));
             const cats = new Set(catalog.map(item => item.Categoria).filter(Boolean));
             categories = ['Todas', ...Array.from(cats)];
 
@@ -515,7 +585,7 @@
             renderCatalog(catalog);
         } catch (error) {
             console.error("Error cargando datos:", error);
-            catalog = parseCSV(mockData);
+            catalog = ensureRequiredItems(parseCSV(mockData));
             renderCatalog(catalog);
         } finally {
             document.getElementById('loader').classList.add('hidden');
@@ -562,6 +632,22 @@
         renderCatalog(cat === 'Todas' ? catalog : catalog.filter(p => p.Categoria === cat));
     }
 
+    function ensureRequiredItems(items) {
+        const next = [...items];
+        if (!next.some(item => item.Categoria === 'Quesadillas')) {
+            next.push({
+                ID: 'Quesadillas-1',
+                Nombre: 'Quesadillas',
+                Categoria: 'Quesadillas',
+                Precio: '25',
+                Imagen: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&q=80',
+                Badge: '',
+                Disponibilidad: 'Activo'
+            });
+        }
+        return next;
+    }
+
     function escapeHtml(value) {
         return String(value ?? '')
             .replaceAll('&', '&amp;')
@@ -575,23 +661,40 @@
         return !(item.Disponibilidad && item.Disponibilidad.toLowerCase() === 'próximamente');
     }
 
-    function isInfladita(item) {
-        return item.Categoria === 'Infladitas Placeras';
+    function getMenuConfig(categoryName) {
+        return menuConfigs[categoryName] || null;
     }
 
-    function getInfladitaPrice(index) {
-        return infladitaTypeOptions[index] || infladitaTypeOptions[0];
+    function getPreviewPrice(categoryName) {
+        const config = getMenuConfig(categoryName);
+        if (!config) return 0;
+        if (config.mode === 'infladita') return infladitaTypeOptions[0].price;
+        if (config.mode === 'singleVariant') return config.options[0].price;
+        if (config.mode === 'pozole') return 60;
+        if (config.mode === 'quantity') return Number(config.fixedPrice) || 0;
+        return 0;
     }
 
     function openOptionsModal(itemId) {
         const item = catalog.find(product => product.ID === itemId);
         if (!item) return;
 
+        const config = getMenuConfig(item.Categoria);
+        if (!config || config.mode === 'quantity') return;
+
         selectedOptionState = {
             item,
             quantity: 1,
-            selectedTypeIndex: 0
+            config,
+            selectedIndexes: {}
         };
+
+        if (config.mode === 'pozole') {
+            selectedOptionState.selectedIndexes.style = item.Nombre.toLowerCase().includes('blanco') ? 1 : 0;
+            selectedOptionState.selectedIndexes.size = 0;
+        } else {
+            selectedOptionState.selectedIndexes.option = 0;
+        }
 
         renderOptionsModal();
         document.getElementById('optionsModal').classList.remove('hidden');
@@ -616,41 +719,104 @@
         renderOptionsModal();
     }
 
-    function selectInfladitaType(index) {
+    function selectOptionValue(group, index) {
         if (!selectedOptionState) return;
-        selectedOptionState.selectedTypeIndex = index;
+        selectedOptionState.selectedIndexes[group] = index;
         renderOptionsModal();
+    }
+
+    function getSelectedOptionPrice() {
+        if (!selectedOptionState) return 0;
+        const { config, selectedIndexes } = selectedOptionState;
+
+        if (config.mode === 'infladita') {
+            return infladitaTypeOptions[selectedIndexes.option ?? 0]?.price || infladitaTypeOptions[0].price;
+        }
+
+        if (config.mode === 'singleVariant') {
+            return config.options[selectedIndexes.option ?? 0]?.price || config.options[0].price;
+        }
+
+        if (config.mode === 'pozole') {
+            const style = config.styles[selectedIndexes.style ?? 0]?.label || config.styles[0].label;
+            const size = config.sizes[selectedIndexes.size ?? 0]?.label || config.sizes[0].label;
+            return config.priceMap[`${style}|${size}`] || 0;
+        }
+
+        return Number(config.fixedPrice) || 0;
+    }
+
+    function getSelectedOptionLabel() {
+        if (!selectedOptionState) return '';
+        const { config, selectedIndexes } = selectedOptionState;
+
+        if (config.mode === 'infladita') {
+            return infladitaTypeOptions[selectedIndexes.option ?? 0]?.label || infladitaTypeOptions[0].label;
+        }
+
+        if (config.mode === 'singleVariant') {
+            return config.options[selectedIndexes.option ?? 0]?.label || config.options[0].label;
+        }
+
+        if (config.mode === 'pozole') {
+            const style = config.styles[selectedIndexes.style ?? 0]?.label || config.styles[0].label;
+            const size = config.sizes[selectedIndexes.size ?? 0]?.label || config.sizes[0].label;
+            return `${style} - ${size}`;
+        }
+
+        return config.subtitle || '';
     }
 
     function renderOptionsModal() {
         if (!selectedOptionState) return;
 
-        const { item, quantity, selectedTypeIndex } = selectedOptionState;
-        const type = getInfladitaPrice(selectedTypeIndex);
+        const { item, quantity, config, selectedIndexes } = selectedOptionState;
+        const price = getSelectedOptionPrice();
 
-        document.getElementById('optionsTitle').textContent = item.Nombre;
-        document.getElementById('optionsSubtitle').textContent = 'Elige el tipo de infladita y la cantidad.';
+        document.getElementById('optionsTitle').textContent = config.title || item.Nombre;
+        document.getElementById('optionsSubtitle').textContent = config.subtitle || 'Elige una opción y la cantidad.';
         document.getElementById('optionsImage').src = item.Imagen || 'https://via.placeholder.com/600x400?text=Sin+Imagen';
         document.getElementById('optionsQty').textContent = quantity;
-        document.getElementById('optionsTotal').textContent = `$${(type.price * quantity).toFixed(2)}`;
+        document.getElementById('optionsTotal').textContent = `$${(price * quantity).toFixed(2)}`;
 
         const groupsContainer = document.getElementById('optionsGroups');
+        const renderOptionButtons = (options, selectedKey) => options.map((option, index) => {
+            const isActive = index === (selectedIndexes[selectedKey] ?? 0);
+            return `
+                <button
+                    onclick="selectOptionValue('${selectedKey}', ${index})"
+                    class="text-left rounded-xl border px-3 py-2 transition ${isActive ? 'border-brand-red bg-brand-red text-white shadow-md' : 'border-gray-200 bg-white text-gray-700'}"
+                >
+                    <span class="block text-sm font-semibold">${escapeHtml(option.label)}</span>
+                    ${option.price !== undefined ? `<span class="block text-[11px] ${isActive ? 'text-white/90' : 'text-brand-green font-semibold'}">$${Number(option.price).toFixed(2)}</span>` : ''}
+                </button>
+            `;
+        }).join('');
+
+        if (config.mode === 'pozole') {
+            groupsContainer.innerHTML = `
+                <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                    <h3 class="font-bold text-brand-dark mb-3">Tipo</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        ${renderOptionButtons(config.styles, 'style')}
+                    </div>
+                </div>
+                <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                    <h3 class="font-bold text-brand-dark mb-3">Tamaño</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        ${renderOptionButtons(config.sizes, 'size')}
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        const options = config.mode === 'infladita' ? infladitaTypeOptions : config.options;
         groupsContainer.innerHTML = `
             <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50">
-                <h3 class="font-bold text-brand-dark mb-3">Tipo</h3>
+                <h3 class="font-bold text-brand-dark mb-3">${config.mode === 'infladita' ? 'Tipo' : 'Opción'}</h3>
                 <div class="grid grid-cols-1 gap-2">
-                    ${infladitaTypeOptions.map((option, index) => {
-                        const isActive = index === selectedTypeIndex;
-                        return `
-                            <button
-                                onclick="selectInfladitaType(${index})"
-                                class="text-left rounded-xl border px-3 py-2 transition ${isActive ? 'border-brand-red bg-brand-red text-white shadow-md' : 'border-gray-200 bg-white text-gray-700'}"
-                            >
-                                <span class="block text-sm font-semibold">${escapeHtml(option.label)}</span>
-                                <span class="block text-[11px] ${isActive ? 'text-white/90' : 'text-brand-green font-semibold'}">$${Number(option.price).toFixed(2)}</span>
-                            </button>
-                        `;
-                    }).join('')}
+                    ${renderOptionButtons(options, 'option')}
                 </div>
             </div>
         `;
@@ -659,10 +825,11 @@
     function confirmOptions() {
         if (!selectedOptionState) return;
 
-        const { item, quantity, selectedTypeIndex } = selectedOptionState;
-        const type = getInfladitaPrice(selectedTypeIndex);
-        const key = `${item.ID}::${type.label}`;
-        const productName = `${item.Nombre} - ${type.label}`;
+        const { item, quantity, config } = selectedOptionState;
+        const optionLabel = getSelectedOptionLabel();
+        const optionPrice = getSelectedOptionPrice();
+        const key = `${item.ID}::${optionLabel}`;
+        const productName = `${item.Nombre}${optionLabel ? ` - ${optionLabel}` : ''}`;
 
         if (!cart[key]) {
             cart[key] = {
@@ -670,13 +837,13 @@
                     ID: key,
                     Nombre: productName,
                     Categoria: item.Categoria,
-                    Precio: type.price.toFixed(2),
+                    Precio: optionPrice.toFixed(2),
                     Imagen: item.Imagen,
                     Badge: item.Badge || '',
                     Disponibilidad: item.Disponibilidad || 'Activo'
                 },
                 quantity: 0,
-                variantLabel: `Tipo: ${type.label}`
+                variantLabel: optionLabel ? `${config.variantLabel || 'Opción'}: ${optionLabel}` : ''
             };
         }
 
@@ -702,13 +869,33 @@
             return acc;
         }, {});
 
-        Object.entries(groupedItems).forEach(([categoryName, categoryItems]) => {
+        const categoryOrder = [
+            'Infladitas Placeras',
+            'Quesadillas',
+            'Tostadas',
+            'Pozole de Puerco',
+            'Tacos Dorados',
+            'Aguas Frescas',
+            'Refrescos',
+            'Postres'
+        ];
+        const orderedCategories = [
+            ...categoryOrder.filter(cat => groupedItems[cat]),
+            ...Object.keys(groupedItems).filter(cat => !categoryOrder.includes(cat))
+        ];
+
+        orderedCategories.forEach(categoryName => {
+            const categoryItems = groupedItems[categoryName];
+            const simpleQuantityCategory = ['Tacos Dorados', 'Refrescos', 'Postres'].includes(categoryName);
             const header = document.createElement('div');
             header.className = "col-span-full mt-6 mb-2 flex items-center gap-2 border-b-2 border-gray-100 pb-2";
             const icon = categoryIcons[categoryName] || '<i class="fa-solid fa-utensils"></i>';
+            const config = getMenuConfig(categoryName);
+            const dayBadge = config?.dayBadge ? `<span class="ml-auto text-[10px] font-bold px-2 py-1 rounded-full ${config.dayBadge === 'Viernes' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'}">${config.dayBadge}</span>` : '';
             header.innerHTML = `
                     <span class="text-brand-red text-xl">${icon}</span>
                     <h2 class="text-lg font-bold text-brand-dark">${escapeHtml(categoryName)}</h2>
+                    ${dayBadge}
                 `;
             grid.appendChild(header);
 
@@ -717,7 +904,8 @@
                 const isAvailable = isAvailableItem(item);
                 const cardPrice = Number.parseFloat(item.Precio) || 0;
                 const badge = item.Badge && item.Badge.trim() !== '' ? item.Badge : '';
-                const infladita = isInfladita(item);
+                const config = getMenuConfig(item.Categoria);
+                const currentQty = cart[item.ID]?.quantity || 0;
                 card.className = "bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden flex flex-col relative";
                 card.innerHTML = `
                     ${badge ? `<div class="absolute top-1 left-1 bg-brand-orange text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">${escapeHtml(badge)}</div>` : ''}
@@ -726,14 +914,27 @@
                     </div>
                     <div class="p-2 flex flex-col flex-1">
                         <h3 class="font-semibold text-[11px] leading-tight text-gray-800 mb-1 flex-1 line-clamp-2" title="${escapeHtml(item.Nombre)}">${escapeHtml(item.Nombre)}</h3>
+                        ${categoryName === 'Tacos Dorados' ? `<p class="text-[10px] text-gray-500 mb-1">Orden con 4 tacos</p>` : ''}
                         <div class="flex items-center justify-between mb-2 mt-1">
-                            ${infladita
-                                ? `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">Desde $${infladitaTypeOptions[0].price.toFixed(2)}</span>`
+                            ${config && config.mode !== 'quantity'
+                                ? `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">Desde $${getPreviewPrice(categoryName).toFixed(2)}</span>`
                                 : (isAvailable ? `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">$${cardPrice.toFixed(2)}</span>` : `<span class="font-bold text-gray-400 text-[10px] italic">Próximamente</span>`)
                             }
                         </div>
                         <div class="mt-auto">
-                            ${infladita
+                            ${simpleQuantityCategory
+                                ? `
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-md p-1 border border-gray-100">
+                                        <button onclick="updateQty('${item.ID}', -1)" ${currentQty <= 0 ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded bg-white text-brand-red shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                            <i class="fa-solid fa-minus text-[10px]"></i>
+                                        </button>
+                                        <span class="font-bold text-[11px] w-6 text-center">${currentQty}</span>
+                                        <button onclick="updateQty('${item.ID}', 1)" class="w-7 h-7 flex items-center justify-center rounded bg-brand-red text-white shadow-sm">
+                                            <i class="fa-solid fa-plus text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                  `
+                                : (config && config.mode !== 'quantity'
                                 ? `<button onclick="openOptionsModal('${item.ID}')" ${isAvailable ? '' : 'disabled'} class="w-full py-1.5 rounded-md bg-gray-50 text-brand-red font-semibold text-[11px] hover:bg-brand-red hover:text-white transition flex items-center justify-center gap-1 border border-gray-100 disabled:opacity-70 disabled:cursor-not-allowed">
                                         <i class="fa-solid fa-sliders"></i> Elegir tipo
                                    </button>`
@@ -743,7 +944,7 @@
                                                 <i class="fa-solid fa-plus text-[9px]"></i> Agregar
                                            </button>`
                                         : `<div class="w-full py-1.5 rounded-md bg-gray-100 text-gray-400 font-semibold text-[10px] text-center border border-gray-200">Agotado</div>`
-                                )
+                                ))
                             }
                         </div>
                     </div>
@@ -755,9 +956,20 @@
 
     // LÓGICA DEL CARRITO
     function updateQty(id, delta) {
-        if (!cart[id]) return;
+        const product = catalog.find(p => p.ID === id);
+        if (!product) return;
 
-        if (cart[id]) {
+        if (!cart[id]) {
+            if (delta > 0) {
+                cart[id] = {
+                    product,
+                    quantity: 1,
+                    variantLabel: product.Categoria === 'Tacos Dorados' ? 'Orden con 4 tacos' : ''
+                };
+            } else {
+                return;
+            }
+        } else {
             cart[id].quantity += delta;
             if (cart[id].quantity <= 0) delete cart[id];
         }
