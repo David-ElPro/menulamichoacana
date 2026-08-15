@@ -1,0 +1,751 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Interactivo | La Michoacana</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Intro.js para el Tutorial -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            red: '#E3003F',
+                            green: '#008A45',
+                            orange: '#F9A826',
+                            cream: '#FFF9F0',
+                            dark: '#2D3748'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #FFF9F0; scroll-behavior: smooth; overflow-x: hidden; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Truncate text to multiple lines */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Estilos responsivos optimizados para Intro.js en móviles */
+        .introjs-tooltip {
+            max-width: min(90vw, 300px) !important;
+            box-sizing: border-box !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+            font-family: 'Poppins', sans-serif !important;
+            border: none !important;
+            padding: 15px !important;
+        }
+        .introjs-tooltiptext {
+            font-size: 13px !important;
+            line-height: 1.4 !important;
+            padding: 0 0 10px 0 !important;
+        }
+        .introjs-tooltipbuttons {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            border-top: 1px solid #f3f4f6 !important;
+            padding-top: 10px !important;
+            margin-top: 5px !important;
+        }
+        .introjs-button {
+            border-radius: 8px !important;
+            text-shadow: none !important;
+            background-image: none !important;
+            box-shadow: none !important;
+            font-weight: 600 !important;
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+        }
+        .introjs-nextbutton, .introjs-donebutton {
+            background-color: #E3003F !important;
+            color: white !important;
+            border: none !important;
+        }
+        .introjs-prevbutton {
+            background-color: #f3f4f6 !important;
+            color: #4b5563 !important;
+            border: none !important;
+        }
+        .introjs-skipbutton {
+            color: #9ca3af !important;
+            font-weight: 500 !important;
+        }
+        .introjs-bullets ul li a.active {
+            background: #E3003F !important;
+        }
+    </style>
+</head>
+<body class="text-brand-dark pb-28">
+
+<!-- Navbar -->
+<nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-40 px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-2">
+        <span class="text-brand-red text-xl font-bold"><i class="fa-solid fa-utensils"></i> Infladitas</span>
+    </div>
+    <div class="flex gap-4 text-brand-dark">
+        <button class="text-xl relative" onclick="toggleCart()">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span id="nav-cart-badge" class="absolute -top-2 -right-2 bg-brand-green text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="mt-14 relative bg-brand-dark text-white rounded-b-3xl overflow-hidden mx-2 shadow-lg">
+    <img src="https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?auto=format&fit=crop&w=800&q=80" alt="Fondo comida" class="absolute inset-0 w-full h-full object-cover opacity-40">
+    <div class="relative z-10 p-6 flex flex-col items-center text-center">
+        <h1 class="text-4xl font-bold font-serif mb-2 italic">La Michoacana</h1>
+        <p class="text-sm font-light mb-6">Sabor que Enamora, ¡Hechas al momento! <i class="fa-solid fa-heart text-brand-red"></i></p>
+
+        <div class="flex gap-4 w-full justify-center max-w-sm">
+            <a href="#menu" class="flex-1 bg-white text-brand-red rounded-xl py-3 px-2 flex flex-col items-center gap-1 shadow-md hover:bg-gray-50 transition">
+                <i class="fa-solid fa-book-open text-xl"></i>
+                <span class="text-xs font-semibold">Ver Menú</span>
+            </a>
+            <a href="https://wa.me/527772359631" target="_blank" class="flex-1 bg-brand-green text-white rounded-xl py-3 px-2 flex flex-col items-center gap-1 shadow-md hover:bg-green-600 transition">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                <span class="text-xs font-semibold">Pedir</span>
+            </a>
+        </div>
+    </div>
+    <!-- Info bar -->
+    <div class="relative z-10 bg-white/10 backdrop-blur-sm p-3 flex justify-around text-xs border-t border-white/20">
+        <div class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 3:30 PM</div>
+        <div class="flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Constitución</div>
+        <div class="flex items-center gap-1"><i class="fa-solid fa-phone"></i> 7772359631</div>
+    </div>
+</header>
+
+<!-- Banner de Horarios y Días de Venta (Glassmorphism) -->
+<div id="scheduleBanner" class="mx-3 mt-5 mb-2 p-4 rounded-2xl bg-white/60 backdrop-blur-lg border border-white shadow-[0_8px_30px_rgb(0,0,0,0.06)]" data-intro="¡Ojo! Revisa aquí nuestros días de venta para que planifiques tu antojo." data-step="2">
+    <h3 class="text-brand-red font-bold text-sm mb-3 flex items-center gap-2">
+        <i class="fa-regular fa-calendar-check text-lg"></i> Días de Especialidad
+    </h3>
+    <div class="grid grid-cols-2 gap-3 text-xs">
+        <div class="bg-white/80 p-3 rounded-xl shadow-sm border border-gray-100/50 relative overflow-hidden group">
+            <div class="absolute -right-2 -bottom-2 opacity-10 text-brand-dark group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cookie text-4xl"></i>
+            </div>
+            <span class="font-bold text-brand-dark block mb-1 text-sm">Viernes</span>
+            <span class="text-gray-600 font-medium relative z-10">Solo Infladitas</span>
+        </div>
+        <div class="bg-white/80 p-3 rounded-xl shadow-sm border border-gray-100/50 relative overflow-hidden group">
+            <div class="absolute -right-2 -bottom-2 opacity-10 text-brand-dark group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-taco text-4xl"></i>
+            </div>
+            <span class="font-bold text-brand-dark block mb-1 text-sm">Sábados</span>
+            <span class="text-gray-600 font-medium relative z-10">Tostadas y Tacos Dorados</span>
+        </div>
+    </div>
+</div>
+
+<!-- Buscador y Filtros -->
+<section id="menu" class="px-3 py-4 sticky top-14 bg-brand-cream z-30">
+    <div class="relative mb-4">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input type="text" id="searchInput" placeholder="Buscar platillo, ingrediente..." class="w-full bg-white rounded-full py-3 pl-12 pr-4 shadow-sm border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-red" data-intro="Usa este buscador si ya sabes exactamente qué se te antoja." data-step="1">
+    </div>
+
+    <!-- Categorías -->
+    <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2" id="categoryFilters" data-intro="O explora nuestro menú filtrando por categorías en estos botones." data-step="3">
+        <!-- Renderizado desde JS -->
+    </div>
+</section>
+
+<!-- Grid de Productos -->
+<main class="px-3 min-h-[50vh]">
+    <!-- Loader -->
+    <div id="loader" class="text-center py-10 hidden">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-brand-red"></i>
+        <p class="text-gray-500 mt-2 text-sm">Cargando menú delicioso...</p>
+    </div>
+
+    <!-- Grid -->
+    <div id="productsGrid" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4">
+        <!-- Tarjetas de productos renderizadas aquí -->
+    </div>
+</main>
+
+<!-- Misión, Visión y Ubicación (Footer) -->
+<section class="mt-10 mb-8 px-4">
+    <!-- Misión y Visión -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-4">
+        <div class="mb-5">
+            <div class="flex items-center gap-2 mb-2 text-brand-red">
+                <i class="fa-solid fa-bullseye text-lg"></i>
+                <h3 class="font-bold text-lg text-brand-dark">Nuestra Misión</h3>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                Deleitar el paladar de nuestros clientes con el auténtico sabor de la comida tradicional mexicana, preparando cada infladita y antojito al momento con ingredientes frescos, amor y una calidad que enamora en cada bocado.
+            </p>
+        </div>
+        <div class="w-full h-px bg-gray-100 mb-5"></div>
+        <div>
+            <div class="flex items-center gap-2 mb-2 text-brand-red">
+                <i class="fa-solid fa-eye text-lg"></i>
+                <h3 class="font-bold text-lg text-brand-dark">Nuestra Visión</h3>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                Ser la antojería mexicana de referencia en Jiutepec y todo Morelos, reconocida por preservar las recetas tradicionales familiares, brindando una experiencia cálida, deliciosa y accesible para todas las familias.
+            </p>
+        </div>
+    </div>
+
+    <!-- Ubicación -->
+    <a href="https://maps.app.goo.gl/dSWRCnUSBFvAjW589" target="_blank" class="block bg-brand-dark text-white rounded-2xl p-5 shadow-lg shadow-brand-dark/20 hover:-translate-y-1 transition-transform relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 text-white/10 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-map-location-dot text-8xl"></i>
+        </div>
+        <div class="relative z-10 flex items-start gap-3">
+            <div class="bg-brand-orange/20 p-2 rounded-xl text-brand-orange mt-1">
+                <i class="fa-solid fa-location-dot text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg mb-1 flex items-center gap-2">Visítanos <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-50"></i></h3>
+                <p class="text-xs text-gray-300 leading-relaxed mb-2">
+                    Calle Emiliano Zapata 04,<br>
+                    Colonia Constitución,<br>
+                    Jiutepec, Morelos.
+                </p>
+                <p class="text-[11px] text-brand-orange font-semibold bg-brand-orange/10 inline-block px-2 py-1 rounded-md">
+                    📍 Casa del Bury o Doña Mago Guerrero
+                </p>
+            </div>
+        </div>
+    </a>
+</section>
+
+<!-- FABs -->
+<div class="fixed bottom-6 right-4 flex flex-col gap-3 z-40">
+    <!-- FAB WhatsApp Flotante con Tooltip -->
+    <div class="relative">
+        <!-- Tooltip "Ordena ahora" -->
+        <div id="wa-tooltip" class="absolute -top-10 right-0 bg-brand-dark text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-md opacity-0 pointer-events-none transition-opacity duration-300">
+            Ordena ahora 👋
+            <div class="absolute -bottom-1 right-3 w-2 h-2 bg-brand-dark transform rotate-45"></div>
+        </div>
+        <a href="https://wa.me/527772359631" target="_blank" class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <!-- FAB Carrito -->
+    <button onclick="toggleCart()" class="relative w-14 h-14 bg-brand-red text-white rounded-full flex items-center justify-center shadow-lg shadow-brand-red/40 hover:scale-105 transition-transform" data-intro="¡Y listo! Presiona aquí para revisar tu pedido y enviarlo por WhatsApp." data-step="5">
+        <i class="fa-solid fa-cart-shopping text-xl"></i>
+        <span id="fab-cart-badge" class="absolute -top-1 -right-1 bg-white text-brand-red text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-brand-red shadow-sm hidden">0</span>
+    </button>
+</div>
+
+<!-- OVERLAY OSCURO -->
+<div id="overlay" class="fixed inset-0 bg-black/50 z-50 hidden backdrop-blur-sm transition-opacity" onclick="closeAllModals()"></div>
+
+<!-- MODAL CARRITO (Resumen) -->
+<div id="cartModal" class="fixed bottom-0 left-0 w-full bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 max-h-[85vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
+    <div class="p-4 border-b flex justify-between items-center">
+        <h2 class="text-xl font-bold">Tu Pedido</h2>
+        <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div id="cartItems" class="p-4 overflow-y-auto flex-1 pb-32">
+        <!-- Items del carrito -->
+    </div>
+
+    <div class="p-4 border-t bg-gray-50 absolute bottom-0 w-full rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <span class="font-semibold text-gray-600">Total:</span>
+            <span id="cartTotal" class="text-2xl font-bold text-brand-dark">$0.00</span>
+        </div>
+        <button onclick="openCheckout()" id="btnContinuar" class="w-full bg-brand-red text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-brand-red/30 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+            Continuar <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- MODAL CHECKOUT (Datos del Cliente) -->
+<div id="checkoutModal" class="fixed bottom-0 left-0 w-full bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
+    <div class="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+        <div class="flex items-center gap-3">
+            <button onclick="backToCart()" class="text-gray-500 hover:text-brand-red w-8 h-8 flex items-center justify-center rounded-full bg-gray-50"><i class="fa-solid fa-arrow-left"></i></button>
+            <h2 class="text-xl font-bold">Datos de Envío</h2>
+        </div>
+        <button onclick="closeAllModals()" class="text-gray-400 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="p-5 flex flex-col gap-4 pb-32">
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Nombre Completo *</label>
+            <input type="text" id="clientName" placeholder="Ej. Juan Pérez" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Teléfono de Contacto *</label>
+            <input type="tel" id="clientPhone" placeholder="10 dígitos" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Domicilio (Opcional si pasas a recoger)</label>
+            <textarea id="clientAddress" rows="2" placeholder="Calle, Colonia, Referencias..." class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red"></textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Comentarios</label>
+            <textarea id="clientNotes" rows="2" placeholder="Ej. Sin cebolla, pago con billete de $500..." class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red"></textarea>
+        </div>
+    </div>
+
+    <div class="p-4 border-t bg-white sticky bottom-0 w-full shadow-[0_-10px_20px_rgba(0,0,0,0.05)] rounded-t-3xl">
+        <button onclick="sendOrderViaWhatsApp()" class="w-full bg-brand-green text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-green-500/30 flex items-center justify-center gap-2">
+            <i class="fa-brands fa-whatsapp text-xl"></i> Enviar Pedido
+        </button>
+    </div>
+</div>
+
+<!-- LOGICA JAVASCRIPT -->
+<script>
+    const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtkpDxOK3YprnXdJbukRhYDNaXtHwV3cE2Hu4hokyZ5p0eaOwzFdGsX0PyRyiU-GkD5fbD2Oy9HiMQ/pub?output=csv';
+    const WHATSAPP_NUMBER = '527772359631';
+
+    const mockData = `ID,Nombre,Categoria,Precio,Imagen,Badge,Disponibilidad
+1,Frijol,Infladitas Placeras,25,https://images.unsplash.com/photo-1512805147242-c3e794fc2553?w=300&q=80,,Activo
+2,Pollo con Papas,Infladitas Placeras,30,https://images.unsplash.com/photo-1604544600109-f305f6cecf95?w=300&q=80,,Activo
+3,Tinga,Infladitas Placeras,30,https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=300&q=80,,Activo
+4,Chicharrón,Infladitas Placeras,30,https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=300&q=80,,Activo
+5,Longaniza con Papas,Infladitas Placeras,30,https://images.unsplash.com/photo-1584345630045-81498b826e7d?w=300&q=80,,Activo
+6,Picadillo,Infladitas Placeras,30,https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&q=80,,Activo
+7,Champiñones,Infladitas Placeras,30,https://images.unsplash.com/photo-1600289031464-74d374b64991?w=300&q=80,,Activo
+8,Sencilla,Tostadas,20,https://images.unsplash.com/photo-1584345630045-81498b826e7d?w=300&q=80,,Activo
+9,Tinga,Tostadas,25,https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=300&q=80,,Activo
+10,Picadillo,Tostadas,25,https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&q=80,,Activo
+11,Pollo,Tostadas,25,https://images.unsplash.com/photo-1604544600109-f305f6cecf95?w=300&q=80,,Activo
+12,Papa,Tacos Dorados,40,https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&q=80,,Activo
+13,Longaniza,Tacos Dorados,45,https://images.unsplash.com/photo-1584345630045-81498b826e7d?w=300&q=80,,Activo
+14,Requesón,Tacos Dorados,45,https://images.unsplash.com/photo-1600289031464-74d374b64991?w=300&q=80,,Activo
+15,Queso,Tacos Dorados,40,https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=300&q=80,,Activo
+16,Pozole Rojo,Pozole de Puerco,85,https://images.unsplash.com/photo-1548943487-a2e4b43b3970?w=300&q=80,🌟 Estilo Michoacán,Activo
+17,Pozole Blanco,Pozole de Puerco,85,https://images.unsplash.com/photo-1548943487-a2e4b43b3970?w=300&q=80,,Activo
+18,Agua del Día,Aguas Frescas,20,https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300&q=80,,Activo
+19,Refresco,Refrescos,25,https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300&q=80,,Activo
+20,Flan de Leche,Postres,35,https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=300&q=80,,Activo
+21,Postre Sorpresa,Postres,0,https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80,,Próximamente`;
+
+    let catalog = [];
+    let categories = ['Todas'];
+    let activeCategory = 'Todas';
+    let cart = {};
+
+    const categoryIcons = {
+        'Infladitas Placeras': '<i class="fa-solid fa-cookie"></i>',
+        'Tostadas': '<i class="fa-solid fa-pizza-slice"></i>',
+        'Tacos Dorados': '<i class="fa-solid fa-taco"></i>',
+        'Pozole de Puerco': '<i class="fa-solid fa-bowl-food"></i>',
+        'Aguas Frescas': '<i class="fa-solid fa-glass-water"></i>',
+        'Refrescos': '<i class="fa-solid fa-bottle-droplet"></i>',
+        'Postres': '<i class="fa-solid fa-cake-candles"></i>',
+        'Todas': '<i class="fa-solid fa-border-all"></i>'
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchData().then(() => {
+            iniciarTutorial();
+        });
+        setupSearch();
+        setupWhatsAppTooltip();
+    });
+
+    // --- LÓGICA DEL TUTORIAL ---
+    function iniciarTutorial() {
+        if (localStorage.getItem('tutorialVisto')) {
+            return;
+        }
+
+        const primerProducto = document.querySelector('#productsGrid .bg-white');
+        if (primerProducto) {
+            primerProducto.setAttribute('data-intro', 'Presiona el botón de "+ Agregar" para ir armando tu antojo.');
+            primerProducto.setAttribute('data-step', '4');
+        }
+
+        const tour = introJs();
+        tour.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Atrás',
+            skipLabel: 'Omitir',
+            doneLabel: '¡Entendido!',
+            showProgress: true,
+            showBullets: true,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            scrollToElement: true
+        });
+
+        tour.oncomplete(() => localStorage.setItem('tutorialVisto', 'true'));
+        tour.onexit(() => localStorage.setItem('tutorialVisto', 'true'));
+
+        setTimeout(() => {
+            tour.start();
+        }, 800);
+    }
+    // -----------------------------
+
+    function setupWhatsAppTooltip() {
+        if (!sessionStorage.getItem('waTooltipShown')) {
+            setTimeout(() => {
+                const tooltip = document.getElementById('wa-tooltip');
+                tooltip.classList.remove('opacity-0');
+                setTimeout(() => {
+                    tooltip.classList.add('opacity-0');
+                    sessionStorage.setItem('waTooltipShown', 'true');
+                }, 3500);
+            }, 1500);
+        }
+    }
+
+    function parseCSV(str) {
+        const lines = str.split('\n').filter(line => line.trim() !== '');
+        const headers = lines[0].split(',').map(h => h.trim());
+        const result = [];
+        for (let i = 1; i < lines.length; i++) {
+            const currentline = lines[i].split(',');
+            const obj = {};
+            headers.forEach((h, j) => {
+                obj[h] = currentline[j] ? currentline[j].trim() : '';
+            });
+            result.push(obj);
+        }
+        return result;
+    }
+
+    async function fetchData() {
+        document.getElementById('loader').classList.remove('hidden');
+        try {
+            let dataToParse = mockData;
+            if(GOOGLE_SHEETS_CSV_URL && GOOGLE_SHEETS_CSV_URL.startsWith('http')) {
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+                if(response.ok) dataToParse = await response.text();
+            }
+
+            catalog = parseCSV(dataToParse);
+            const cats = new Set(catalog.map(item => item.Categoria).filter(Boolean));
+            categories = ['Todas', ...Array.from(cats)];
+
+            renderCategoryFilters();
+            renderCatalog(catalog);
+        } catch (error) {
+            console.error("Error cargando datos:", error);
+            catalog = parseCSV(mockData);
+            renderCatalog(catalog);
+        } finally {
+            document.getElementById('loader').classList.add('hidden');
+        }
+    }
+
+    function renderCategoryFilters() {
+        const container = document.getElementById('categoryFilters');
+        container.innerHTML = '';
+
+        categories.forEach(cat => {
+            const icon = categoryIcons[cat] || '<i class="fa-solid fa-utensils"></i>';
+            const isAct = cat === activeCategory;
+            const activeClass = isAct ? "bg-brand-red text-white shadow-md" : "bg-white text-gray-500 border border-gray-100";
+
+            const btn = document.createElement('div');
+            btn.className = `flex flex-col items-center min-w-[70px] p-2 rounded-2xl cursor-pointer transition whitespace-nowrap ${activeClass}`;
+            btn.onclick = () => filterByCategory(cat);
+            btn.innerHTML = `
+                    <div class="text-xl mb-1">${icon}</div>
+                    <span class="text-[10px] font-medium max-w-[65px] truncate text-center leading-tight whitespace-normal">${cat}</span>
+                `;
+            container.appendChild(btn);
+        });
+    }
+
+    function setupSearch() {
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            activeCategory = 'Todas';
+            renderCategoryFilters();
+            const filtered = catalog.filter(p =>
+                p.Nombre.toLowerCase().includes(term) ||
+                (p.Categoria && p.Categoria.toLowerCase().includes(term))
+            );
+            renderCatalog(filtered);
+        });
+    }
+
+    function filterByCategory(cat) {
+        activeCategory = cat;
+        document.getElementById('searchInput').value = '';
+        renderCategoryFilters();
+        renderCatalog(cat === 'Todas' ? catalog : catalog.filter(p => p.Categoria === cat));
+    }
+
+    function renderCatalog(items) {
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+
+        if (items.length === 0) {
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">No se encontraron productos</div>';
+            return;
+        }
+
+        const groupedItems = items.reduce((acc, item) => {
+            if (!acc[item.Categoria]) acc[item.Categoria] = [];
+            acc[item.Categoria].push(item);
+            return acc;
+        }, {});
+
+        for (const [categoryName, categoryItems] of Object.entries(groupedItems)) {
+
+            const header = document.createElement('div');
+            header.className = "col-span-full mt-6 mb-2 flex items-center gap-2 border-b-2 border-gray-100 pb-2";
+            const icon = categoryIcons[categoryName] || '<i class="fa-solid fa-utensils"></i>';
+            header.innerHTML = `
+                    <span class="text-brand-red text-xl">${icon}</span>
+                    <h2 class="text-lg font-bold text-brand-dark">${categoryName}</h2>
+                `;
+            grid.appendChild(header);
+
+            categoryItems.forEach(item => {
+                const inCart = cart[item.ID];
+                const qty = inCart ? inCart.quantity : 0;
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden flex flex-col relative";
+
+                let badgeHTML = '';
+                if (item.Badge && item.Badge.trim() !== '') {
+                    badgeHTML = `<div class="absolute top-1 left-1 bg-brand-orange text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">${item.Badge}</div>`;
+                }
+
+                const isAvailable = (item.Disponibilidad && item.Disponibilidad.toLowerCase() === 'próximamente') ? false : true;
+
+                let controlsHTML = '';
+                let priceHTML = '';
+
+                if (!isAvailable) {
+                    priceHTML = `<span class="font-bold text-gray-400 text-[10px] italic">Próximamente</span>`;
+                    controlsHTML = `<div class="w-full py-1.5 rounded-md bg-gray-100 text-gray-400 font-semibold text-[10px] text-center border border-gray-200">Agotado</div>`;
+                } else {
+                    priceHTML = `<span class="font-bold text-brand-green bg-green-50 px-1.5 py-0.5 rounded text-[11px]">$${parseFloat(item.Precio).toFixed(2)}</span>`;
+                    if (qty > 0) {
+                        controlsHTML = `
+                                <div class="flex items-center justify-between bg-gray-50 rounded-md p-0.5 border border-gray-100">
+                                    <button onclick="updateQty('${item.ID}', -1)" class="w-6 h-6 flex items-center justify-center rounded bg-white text-brand-red shadow-sm"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                                    <span class="font-bold text-[11px] w-4 text-center">${qty}</span>
+                                    <button onclick="updateQty('${item.ID}', 1)" class="w-6 h-6 flex items-center justify-center rounded bg-brand-red text-white shadow-sm"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                                </div>
+                            `;
+                    } else {
+                        controlsHTML = `
+                                <button onclick="updateQty('${item.ID}', 1)" class="w-full py-1.5 rounded-md bg-gray-50 text-brand-red font-semibold text-[11px] hover:bg-brand-red hover:text-white transition flex items-center justify-center gap-1 border border-gray-100">
+                                    <i class="fa-solid fa-plus text-[9px]"></i> Agregar
+                                </button>
+                            `;
+                    }
+                }
+
+                card.innerHTML = `
+                        ${badgeHTML}
+                        <div class="h-20 sm:h-24 bg-gray-200 relative">
+                            <img src="${item.Imagen || 'https://via.placeholder.com/300x200?text=Sin+Imagen'}" alt="${item.Nombre}" class="w-full h-full object-cover ${!isAvailable ? 'grayscale opacity-70' : ''}">
+                        </div>
+                        <div class="p-2 flex flex-col flex-1">
+                            <h3 class="font-semibold text-[11px] leading-tight text-gray-800 mb-1 flex-1 line-clamp-2" title="${item.Nombre}">${item.Nombre}</h3>
+                            <div class="flex items-center justify-between mb-2 mt-1">
+                                ${priceHTML}
+                            </div>
+                            <div class="mt-auto">
+                                ${controlsHTML}
+                            </div>
+                        </div>
+                    `;
+                grid.appendChild(card);
+            });
+        }
+    }
+
+    // LÓGICA DEL CARRITO
+    function updateQty(id, delta) {
+        const product = catalog.find(p => p.ID === id);
+        if (!product) return;
+
+        if (!cart[id]) {
+            if (delta > 0) cart[id] = { product, quantity: 1 };
+        } else {
+            cart[id].quantity += delta;
+            if (cart[id].quantity <= 0) delete cart[id];
+        }
+
+        updateBadges();
+
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        if (activeCategory === 'Todas') {
+            renderCatalog(searchTerm ? catalog.filter(p => p.Nombre.toLowerCase().includes(searchTerm)) : catalog);
+        } else {
+            renderCatalog(catalog.filter(p => p.Categoria === activeCategory));
+        }
+
+        if (!document.getElementById('cartModal').classList.contains('translate-y-full')) {
+            renderCartModal();
+        }
+    }
+
+    function removeItem(id) {
+        delete cart[id];
+        updateBadges();
+        renderCatalog(catalog.filter(p => activeCategory === 'Todas' || p.Categoria === activeCategory));
+        renderCartModal();
+    }
+
+    function updateBadges() {
+        let totalItems = 0;
+        Object.values(cart).forEach(item => totalItems += item.quantity);
+
+        const badges = [document.getElementById('nav-cart-badge'), document.getElementById('fab-cart-badge')];
+        badges.forEach(badge => {
+            if (totalItems > 0) {
+                badge.textContent = totalItems;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('btnContinuar').disabled = totalItems === 0;
+    }
+
+    function toggleCart() {
+        const modal = document.getElementById('cartModal');
+        const overlay = document.getElementById('overlay');
+        const checkout = document.getElementById('checkoutModal');
+
+        if (!checkout.classList.contains('translate-y-full')) {
+            checkout.classList.add('translate-y-full');
+        }
+
+        if (modal.classList.contains('translate-y-full')) {
+            renderCartModal();
+            modal.classList.remove('translate-y-full');
+            overlay.classList.remove('hidden');
+        } else {
+            modal.classList.add('translate-y-full');
+            overlay.classList.add('hidden');
+        }
+    }
+
+    function openCheckout() {
+        if(Object.keys(cart).length === 0) return;
+        document.getElementById('cartModal').classList.add('translate-y-full');
+        document.getElementById('checkoutModal').classList.remove('translate-y-full');
+    }
+
+    function backToCart() {
+        document.getElementById('checkoutModal').classList.add('translate-y-full');
+        document.getElementById('cartModal').classList.remove('translate-y-full');
+    }
+
+    function closeAllModals() {
+        document.getElementById('cartModal').classList.add('translate-y-full');
+        document.getElementById('checkoutModal').classList.add('translate-y-full');
+        document.getElementById('overlay').classList.add('hidden');
+    }
+
+    function renderCartModal() {
+        const container = document.getElementById('cartItems');
+        const totalEl = document.getElementById('cartTotal');
+        container.innerHTML = '';
+        let total = 0;
+
+        const itemKeys = Object.keys(cart);
+        if (itemKeys.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-400 py-10"><i class="fa-solid fa-basket-shopping text-4xl mb-3"></i><p>Tu carrito está vacío</p></div>';
+            totalEl.textContent = '$0.00';
+            return;
+        }
+
+        itemKeys.forEach(id => {
+            const item = cart[id];
+            const price = parseFloat(item.product.Precio);
+            const subtotal = price * item.quantity;
+            total += subtotal;
+
+            const row = document.createElement('div');
+            row.className = "flex gap-3 py-3 border-b border-gray-100 last:border-0 relative";
+            row.innerHTML = `
+                    <img src="${item.product.Imagen}" class="w-16 h-16 rounded-xl object-cover">
+                    <div class="flex-1 flex flex-col justify-center">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-semibold text-sm leading-tight pr-6">${item.product.Nombre} <span class="text-gray-400 font-normal text-[10px]">(${item.product.Categoria})</span></h4>
+                            <button onclick="removeItem('${id}')" class="text-gray-300 hover:text-brand-red absolute top-3 right-0"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="text-brand-green font-bold text-sm mb-2">$${price.toFixed(2)}</div>
+
+                        <div class="flex items-center gap-3 w-28 bg-gray-50 rounded-lg p-1 border border-gray-100">
+                            <button onclick="updateQty('${id}', -1)" class="w-7 h-7 bg-white rounded shadow-sm text-brand-red flex items-center justify-center"><i class="fa-solid fa-minus text-xs"></i></button>
+                            <span class="font-bold text-sm flex-1 text-center">${item.quantity}</span>
+                            <button onclick="updateQty('${id}', 1)" class="w-7 h-7 bg-brand-red rounded shadow-sm text-white flex items-center justify-center"><i class="fa-solid fa-plus text-xs"></i></button>
+                        </div>
+                    </div>
+                `;
+            container.appendChild(row);
+        });
+
+        totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    function sendOrderViaWhatsApp() {
+        const name = document.getElementById('clientName').value.trim();
+        const phone = document.getElementById('clientPhone').value.trim();
+        const address = document.getElementById('clientAddress').value.trim();
+        const notes = document.getElementById('clientNotes').value.trim();
+
+        if (!name || !phone) {
+            alert("Por favor llena tu nombre y teléfono para procesar el pedido.");
+            return;
+        }
+
+        let text = `*¡Hola! Quiero hacer un pedido.* 🤤\n\n`;
+        text += `*--- Datos del Cliente ---*\n`;
+        text += `👤 *Nombre:* ${name}\n`;
+        text += `📱 *Tel:* ${phone}\n`;
+        if (address) text += `📍 *Domicilio:* ${address}\n`;
+        if (notes) text += `📝 *Notas:* ${notes}\n`;
+
+        text += `\n*--- Mi Pedido ---*\n`;
+
+        let total = 0;
+        Object.values(cart).forEach(item => {
+            const price = parseFloat(item.product.Precio);
+            const sub = price * item.quantity;
+            total += sub;
+            text += `▪️ ${item.quantity}x ${item.product.Nombre} (${item.product.Categoria}) - $${sub.toFixed(2)}\n`;
+        });
+
+        text += `\n💵 *Total a pagar:* *$${total.toFixed(2)}*\n`;
+        text += `\n_Pedido generado desde el menú digital._`;
+
+        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    }
+</script>
+</body>
+</html>
