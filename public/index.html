@@ -248,6 +248,59 @@
     </div>
 </main>
 
+<!-- Sección de Transferencia -->
+<section class="mt-10 mb-6 px-4">
+    <div class="bg-gradient-to-br from-brand-green via-emerald-600 to-green-800 text-white rounded-3xl p-5 shadow-xl shadow-green-900/15 relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10 blur-2xl"></div>
+        <div class="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-black/10 blur-2xl"></div>
+
+        <div class="relative z-10">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <p class="text-[11px] uppercase tracking-[0.28em] text-white/80 font-semibold mb-2">Pago por transferencia</p>
+                    <h3 class="text-2xl font-bold leading-tight">¿Vas a pagar en transferencia?</h3>
+                    <p class="text-sm text-white/85 mt-2 max-w-sm">
+                        Realiza tu transferencia a los siguientes datos y copia la información con un solo toque.
+                    </p>
+                </div>
+                <div class="shrink-0 bg-white/15 border border-white/15 rounded-2xl p-3">
+                    <i class="fa-solid fa-building-columns text-2xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white/12 backdrop-blur-md border border-white/15 rounded-2xl p-4 shadow-lg">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center border border-white/15">
+                            <i class="fa-solid fa-landmark text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.2em] text-white/70 font-semibold">Banco</p>
+                            <p class="font-bold text-lg">Banco Azteca</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-bold px-3 py-1 rounded-full bg-white/15 border border-white/15 uppercase tracking-[0.18em]">Transferencia</span>
+                </div>
+
+                <div class="grid gap-3 text-sm">
+                    <div class="bg-white/10 rounded-xl p-3 border border-white/10">
+                        <p class="text-white/70 text-[11px] uppercase tracking-[0.18em] mb-1">No. de transferencia</p>
+                        <p class="font-semibold text-base break-all select-all">5512382425345826</p>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3 border border-white/10">
+                        <p class="text-white/70 text-[11px] uppercase tracking-[0.18em] mb-1">Nombre</p>
+                        <p class="font-semibold text-base">Marbury Narbu</p>
+                    </div>
+                </div>
+
+                <button onclick="copyTransferData()" class="mt-4 w-full bg-white text-brand-green font-bold py-3 rounded-xl shadow-md hover:bg-emerald-50 transition flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-copy"></i> Copiar datos
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Misión, Visión y Ubicación (Footer) -->
 <section class="mt-10 mb-8 px-4">
     <!-- Misión y Visión -->
@@ -320,6 +373,11 @@
 
 <!-- OVERLAY OSCURO -->
 <div id="overlay" class="fixed inset-0 bg-black/50 z-50 hidden backdrop-blur-sm transition-opacity" onclick="closeAllModals()"></div>
+
+<!-- Toast Copiar -->
+<div id="copyToast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] hidden px-4 py-2 rounded-full bg-brand-dark text-white text-sm font-semibold shadow-xl">
+    Datos copiados
+</div>
 
 <!-- MODAL CARRITO (Resumen) -->
 <div id="cartModal" class="fixed bottom-0 left-0 w-full bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 max-h-[85vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
@@ -427,6 +485,11 @@
 <script>
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtkpDxOK3YprnXdJbukRhYDNaXtHwV3cE2Hu4hokyZ5p0eaOwzFdGsX0PyRyiU-GkD5fbD2Oy9HiMQ/pub?output=csv';
     const WHATSAPP_NUMBER = '527772359631';
+    const TRANSFER_PAYMENT_DATA = {
+        bank: 'Banco Azteca',
+        transferNumber: '5512382425345826',
+        holderName: 'Marbury Narbu'
+    };
 
     const mockData = `ID,Nombre,Categoria,Precio,Imagen,Badge,Disponibilidad
 1,Frijol,Infladitas Placeras,25,https://images.unsplash.com/photo-1512805147242-c3e794fc2553?w=300&q=80,,Activo
@@ -678,6 +741,41 @@
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#39;');
+    }
+
+    function showCopyToast(message) {
+        const toast = document.getElementById('copyToast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        clearTimeout(window.copyToastTimer);
+        window.copyToastTimer = setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 1800);
+    }
+
+    async function copyTransferData() {
+        const text = `Banco: ${TRANSFER_PAYMENT_DATA.bank}\nNo. de transferencia: ${TRANSFER_PAYMENT_DATA.transferNumber}\nNombre: ${TRANSFER_PAYMENT_DATA.holderName}`;
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = text;
+                tempInput.style.position = 'fixed';
+                tempInput.style.opacity = '0';
+                document.body.appendChild(tempInput);
+                tempInput.focus();
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+            }
+            showCopyToast('Datos de transferencia copiados');
+        } catch (error) {
+            console.error('No se pudo copiar la información de transferencia:', error);
+            showCopyToast('No se pudo copiar');
+        }
     }
 
     function getCategoryAnchorId(categoryName) {
